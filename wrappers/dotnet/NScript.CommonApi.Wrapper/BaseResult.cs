@@ -12,13 +12,13 @@ namespace NScript.CommonApi
         Success = 0,
         InvalidInput = -11,
         InvalidRoute = -12,
-        InternalError = -21
+        InternalError = -21,
+        Other = -9999
     }
 
     public class BaseResult
     {
-        public int Code { get; set; }
-        public Error Error { get; set; }
-        public String Message { get; set; }
+        public Error Code { get; set; }
+        public String? Message { get; set; }
     }
 }

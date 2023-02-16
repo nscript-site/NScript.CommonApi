@@ -10,12 +10,12 @@ namespace NScript.CommonApi.WrapperTest
 {
     public class EchoInput
     {
-        public String? Message { get; set; }
+        public String? message { get; set; }
     }
 
     public class EchoOutput : BaseResult
     {
-        public String? Echo { get; set; }
+        public String? echo { get; set; }
     }
 
     public class DemoApiWrapper : ApiWrapper

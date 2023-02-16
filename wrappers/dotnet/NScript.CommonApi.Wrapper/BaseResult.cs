@@ -18,7 +18,7 @@ namespace NScript.CommonApi
 
     public class BaseResult
     {
-        public Error Code { get; set; }
-        public String? Message { get; set; }
+        public Error code { get; set; }
+        public String? message { get; set; }
     }
 }

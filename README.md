@@ -66,12 +66,12 @@ internal partial class EchoSerializeOnlyContext : JsonSerializerContext
 
 public class EchoInput
 {
-    public String Message { get; set; }
+    public String? message { get; set; }
 }
 
 public class EchoOutput : BaseResult
 {
-    public String Echo { get; set; }
+    public String? echo { get; set; }
 }
 ```
 
@@ -86,7 +86,7 @@ public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
     {
         if (input == null) return null;
         EchoOutput output = new EchoOutput();
-        output.Echo = input.Message;
+        output.echo = input.Message;
         return output;
     }
 
@@ -96,7 +96,7 @@ public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
     }
 }
 ```
-这个 ApiHandler 实现的逻辑是，接收一个 EchoInput 输入，产生一个 EchoOutput 输出，输出携带 EchoInput 的 Message 信息。
+这个 ApiHandler 实现的逻辑是，接收一个 EchoInput 输入，产生一个 EchoOutput 输出，输出携带 EchoInput 的 message 信息。
 
 以 NativeAOT 模式 publish，得到 dll，这个 dll 我们暂且命名为 NScript.CommonApi.SdkDemo.dll，大小为 3.6M。
 
@@ -109,12 +109,12 @@ public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
 ```chsarp
 public class EchoInput
 {
-    public String Message { get; set; }
+    public String? message { get; set; }
 }
 
 public class EchoOutput : BaseResult
 {
-    public String Echo { get; set; }
+    public String? echo { get; set; }
 }
 
 public class DemoApiWrapper : ApiWrapper
@@ -132,16 +132,16 @@ public class DemoApiWrapper : ApiWrapper
 开始调用：
 ```csharp
 var wrapper = new DemoApiWrapper();
-EchoOutput output = wrapper.Invoke<EchoInput,EchoOutput>("echo", new EchoInput() { Message = "hello world!" });
+EchoOutput output = wrapper.Invoke<EchoInput,EchoOutput>("echo", new EchoInput() { message = "hello world!" });
 Console.WriteLine(JsonSerializer.Serialize(output));
 
-output = wrapper.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { Message = "hello world!" });
+output = wrapper.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { message = "hello world!" });
 Console.WriteLine(JsonSerializer.Serialize(output));
 ```
 
 输出：
 
 ```json
-{"Echo":"hello world!","Code":0,"Error":0,"Message":null}
-{"Echo":null,"Code":-12,"Error":-12,"Message":"InvalidRoute"}
+{"echo":"hello world!","code":0,"message":null}
+{"echo":null,"code":-12,"message":"InvalidRoute"}
 ```

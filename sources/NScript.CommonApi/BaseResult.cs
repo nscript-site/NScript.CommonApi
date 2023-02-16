@@ -16,16 +16,16 @@ namespace NScript.CommonApi
 
     public class BaseResult
     {
-        public Error Code { get; set; }
-        public String Message { get; set; }
+        public Error code { get; set; }
+        public String? message { get; set; }
 
         public static BaseResult CreateError(Error err, String errMsg = null)
         {
-            BaseResult r = new() { Code = err };
+            BaseResult r = new() { code = err };
             if (err != Error.Success)
             {
-                if (errMsg != null) r.Message = errMsg;
-                else r.Message = err.ToString();
+                if (errMsg != null) r.message = errMsg;
+                else r.message = err.ToString();
             }
             return r;
         }

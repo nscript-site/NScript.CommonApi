@@ -11,6 +11,7 @@ namespace NScript.CommonApi
         Success = 0,
         InvalidInput = -11,
         InvalidRoute = -12,
-        InternalError = -21
+        InternalError = -21,
+        Other = -9999
     }
 }

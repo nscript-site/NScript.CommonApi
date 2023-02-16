@@ -4,6 +4,20 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>NScript.CommonApi</Title>
+    <Authors>nscript-site</Authors>
+    <PackageProjectUrl>https://github.com/nscript-site/NScript.CommonApi</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nscript-site/NScript.CommonApi</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>logo128.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\logo128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

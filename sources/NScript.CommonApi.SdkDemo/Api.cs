@@ -18,12 +18,12 @@ namespace NScript.CommonApi.SdkDemo
 
     public class EchoInput
     {
-        public String Message { get; set; }
+        public String? message { get; set; }
     }
 
     public class EchoOutput : BaseResult
     {
-        public String Echo { get; set; }
+        public String? echo { get; set; }
     }
 
     public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
@@ -32,7 +32,7 @@ namespace NScript.CommonApi.SdkDemo
         {
             if (input == null) return null;
             EchoOutput output = new EchoOutput();
-            output.Echo = input.Message;
+            output.echo = input.message;
             return output;
         }
 

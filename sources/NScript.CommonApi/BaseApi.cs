@@ -4,12 +4,15 @@ namespace NScript.CommonApi
 {
     public class BaseApi
     {
-        protected IntPtr HandleApi(IntPtr pRoute, IntPtr pJsonParams)
+        protected unsafe IntPtr HandleApi(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
         {
             if (pRoute == IntPtr.Zero || pJsonParams == IntPtr.Zero) return IntPtr.Zero;
+
             string jsonParams = Marshal.PtrToStringAnsi(pJsonParams)!;
             string route = Marshal.PtrToStringAnsi(pRoute)!;
-            String result = HandleRoute(route, jsonParams);
+            var payload = (pDataPayload == IntPtr.Zero || payloadLength <= 0) ? Payload.Empty : new Payload(pDataPayload, payloadLength);
+
+            String result = HandleRoute(route, jsonParams, payload);
             if (result == null) return IntPtr.Zero;
             IntPtr pResult = Marshal.StringToHGlobalAnsi(result);
             return pResult;
@@ -23,7 +26,7 @@ namespace NScript.CommonApi
             this.ApiHandlers[route]=handler;
         }
 
-        protected String HandleRoute(String route, String jsonParams)
+        protected String HandleRoute(String route, String jsonParams, Payload payload)
         {
             ApiHandler? match;
             this.ApiHandlers.TryGetValue(route, out match);
@@ -31,7 +34,7 @@ namespace NScript.CommonApi
             if (match == null)
                 return BaseResult.CreateErrorJsonString(Error.InvalidRoute);
 
-            return match.Handle(jsonParams);
+            return match.Handle(jsonParams, payload);
         }
     }
 }

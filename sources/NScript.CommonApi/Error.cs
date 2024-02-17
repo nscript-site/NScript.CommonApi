@@ -12,6 +12,11 @@ namespace NScript.CommonApi
         InvalidInput = -11,
         InvalidRoute = -12,
         InternalError = -21,
+        Unauthorized = -401,
+        Forbidden = -403,
+        NotFound = -404,
+        RequestTimeOut = -408,
+        NotImplemented = -501,
         Other = -9999
     }
 }

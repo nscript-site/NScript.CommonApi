@@ -1,18 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace NScript.CommonApi
 {
     public abstract class ApiWrapper
     {
-        protected abstract IntPtr InvokeApi(IntPtr pRoute, IntPtr pJsonParams);
+        protected abstract IntPtr InvokeApi(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength);
 
-        public TOutput Invoke<TInput,TOutput>(String route, TInput input) where TOutput:class
+        public TOutput Invoke<TInput, TOutput>(String route, TInput input, byte[]? payload = null) where TOutput : class
+        {
+            if(payload == null)
+            {
+                return Invoke<TInput, TOutput>(route, input, IntPtr.Zero, 0);
+            }
+            else
+            {
+                unsafe
+                {
+                    fixed(byte* pData = payload)
+                    {
+                        return Invoke<TInput, TOutput>(route, input, (IntPtr)pData, payload.Length);
+                    }
+                }
+            }
+        }
+
+        public TOutput Invoke<TInput,TOutput>(String route, TInput input, IntPtr pDataPayload, int payloadLength) where TOutput:class
         {
             TOutput output = null;
 
@@ -22,7 +35,7 @@ namespace NScript.CommonApi
             IntPtr pResult = IntPtr.Zero;
             try
             {
-                pResult = InvokeApi(pRoute, pInputStr);
+                pResult = InvokeApi(pRoute, pInputStr, pDataPayload, payloadLength);
                 if (pResult != IntPtr.Zero)
                 {
                     String result = Marshal.PtrToStringAnsi(pResult);

@@ -2,10 +2,18 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>NScript.CommonApi</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Version>7.0.1</Version>
+    <PackageProjectUrl>https://github.com/nscript-site/NScript.CommonApi</PackageProjectUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\sources\NScript.CommonApi\NScript.CommonApi.csproj" />
+  </ItemGroup>
 
 </Project>

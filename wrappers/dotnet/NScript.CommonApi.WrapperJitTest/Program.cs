@@ -1,9 +1,10 @@
-﻿
-using NScript.CommonApi.WrapperTest;
+﻿using NScript.CommonApi.WrapperJitTest;
 using System.Text.Json;
 
 var wrapper = new DemoApiWrapper();
-EchoOutput output = wrapper.Invoke<EchoInput,EchoOutput>("echo", new EchoInput() { message = "hello world!" });
+wrapper.SetJitHook(NScript.CommonApi.SdkDemo.Api.JitHandle);
+
+EchoOutput output = wrapper.Invoke<EchoInput, EchoOutput>("echo", new EchoInput() { message = "hello world!" });
 Console.WriteLine(JsonSerializer.Serialize(output));
 
 output = wrapper.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, new byte[1024]);

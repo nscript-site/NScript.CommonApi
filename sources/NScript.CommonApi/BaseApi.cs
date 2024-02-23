@@ -18,9 +18,9 @@ namespace NScript.CommonApi
             return pResult;
         }
 
-        protected Dictionary<String, ApiHandler> ApiHandlers { get; set; } = new();
+        protected Dictionary<String, IApiHandler> ApiHandlers { get; set; } = new();
 
-        protected void Map(String route, ApiHandler handler)
+        protected void Map(String route, IApiHandler handler)
         {
             if (route == null || handler == null) return;
             this.ApiHandlers[route]=handler;
@@ -28,7 +28,7 @@ namespace NScript.CommonApi
 
         protected String HandleRoute(String route, String jsonParams, Payload payload)
         {
-            ApiHandler? match;
+            IApiHandler? match;
             this.ApiHandlers.TryGetValue(route, out match);
 
             if (match == null)

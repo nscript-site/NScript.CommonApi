@@ -13,6 +13,8 @@ public ref struct Payload
         Length = length;
     }
 
+    public bool IsEmpty => Length <= 0 || DataPointer == IntPtr.Zero;
+
     public unsafe Span<byte> AsSpan()
     {
         return new Span<byte>(DataPointer.ToPointer(), Length);

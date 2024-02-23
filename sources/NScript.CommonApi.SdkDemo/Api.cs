@@ -23,6 +23,23 @@ public class EchoOutput : BaseResult
 
 public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
 {
+    protected override EchoOutput? Handle(EchoInput? input)
+    {
+        if (input == null) return null;
+        EchoOutput output = new EchoOutput();
+        var msg = input.message ?? String.Empty;
+        output.echo = $"{msg}";
+        return output;
+    }
+
+    protected override (JsonTypeInfo<EchoInput>, JsonTypeInfo<EchoOutput>) GetTypeInfos()
+    {
+        return (EchoSerializeOnlyContext.Default.EchoInput, EchoSerializeOnlyContext.Default.EchoOutput);
+    }
+}
+
+public class EchoPayloadApiHandler : TypedPayloadApiHandler<EchoInput, EchoOutput>
+{
     protected override EchoOutput? Handle(EchoInput? input, Payload payload)
     {
         if (input == null) return null;
@@ -46,12 +63,18 @@ public class Api : BaseApi
         // api.Map("your-route1", new YourRoute1ApiHandler());
         // api.Map("your-route2", new YourRoute2ApiHandler());
         api.Map("echo", new EchoApiHandler());
+        api.Map("echo-payload", new EchoPayloadApiHandler());
         return api;
     });
 
     // 可以修改 EntryPoint 为其它名字
     [UnmanagedCallersOnly(EntryPoint = "sdk_demo_api")]
     public unsafe static IntPtr Handle(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
+    {
+        return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
+    }
+
+    public static IntPtr JitHandle(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
     {
         return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
     }

@@ -5,6 +5,19 @@ namespace NScript.CommonApi
 {
     public abstract class ApiWrapper
     {
+        private Func<IntPtr, IntPtr, IntPtr, int, IntPtr>? _jitHandle;
+
+        /// <summary>
+        /// 为这个接口设置 jit hook。方便开发时采用 jit 模式，直接绕开 pinvoke 调用，
+        /// </summary>
+        /// <param name="jitHandle"></param>
+        public void SetJitHook(Func<IntPtr, IntPtr, IntPtr, int, IntPtr> jitHandle)
+        {
+            this._jitHandle = jitHandle;
+        }
+
+        public bool HasJitHook => _jitHandle != null;
+
         protected abstract IntPtr InvokeApi(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength);
 
         public TOutput Invoke<TInput, TOutput>(String route, TInput input, byte[]? payload = null) where TOutput : class
@@ -35,7 +48,10 @@ namespace NScript.CommonApi
             IntPtr pResult = IntPtr.Zero;
             try
             {
-                pResult = InvokeApi(pRoute, pInputStr, pDataPayload, payloadLength);
+                if (_jitHandle != null)
+                    pResult = _jitHandle(pRoute, pInputStr, pDataPayload, payloadLength);
+                else
+                    pResult = InvokeApi(pRoute, pInputStr, pDataPayload, payloadLength);
                 if (pResult != IntPtr.Zero)
                 {
                     String result = Marshal.PtrToStringAnsi(pResult);

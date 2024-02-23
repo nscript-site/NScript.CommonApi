@@ -5,11 +5,13 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NScript.CommonApi.SdkDemo", "NScript.CommonApi.SdkDemo\NScript.CommonApi.SdkDemo.csproj", "{65867901-ABEE-4448-A202-FF974901823F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NScript.CommonApi", "NScript.CommonApi\NScript.CommonApi.csproj", "{A13A4932-FB8C-4188-A02C-9AA917968542}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NScript.CommonApi", "NScript.CommonApi\NScript.CommonApi.csproj", "{A13A4932-FB8C-4188-A02C-9AA917968542}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NScript.CommonApi.Wrapper", "..\wrappers\dotnet\NScript.CommonApi.Wrapper\NScript.CommonApi.Wrapper.csproj", "{BC29E38D-8258-4604-80FB-51D5921BF04A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NScript.CommonApi.Wrapper", "..\wrappers\dotnet\NScript.CommonApi.Wrapper\NScript.CommonApi.Wrapper.csproj", "{BC29E38D-8258-4604-80FB-51D5921BF04A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NScript.CommonApi.WrapperTest", "..\wrappers\dotnet\NScript.CommonApi.WrapperTest\NScript.CommonApi.WrapperTest.csproj", "{9DF7C310-A554-4D21-B244-27EE0E5E57FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NScript.CommonApi.WrapperTest", "..\wrappers\dotnet\NScript.CommonApi.WrapperTest\NScript.CommonApi.WrapperTest.csproj", "{9DF7C310-A554-4D21-B244-27EE0E5E57FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NScript.CommonApi.WrapperJitTest", "..\wrappers\dotnet\NScript.CommonApi.WrapperJitTest\NScript.CommonApi.WrapperJitTest.csproj", "{D36F0F1E-EE9C-497C-A73E-C39E5591B62B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9DF7C310-A554-4D21-B244-27EE0E5E57FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DF7C310-A554-4D21-B244-27EE0E5E57FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DF7C310-A554-4D21-B244-27EE0E5E57FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D36F0F1E-EE9C-497C-A73E-C39E5591B62B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D36F0F1E-EE9C-497C-A73E-C39E5591B62B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D36F0F1E-EE9C-497C-A73E-C39E5591B62B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D36F0F1E-EE9C-497C-A73E-C39E5591B62B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

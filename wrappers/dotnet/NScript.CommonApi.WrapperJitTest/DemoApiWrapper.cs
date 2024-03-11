@@ -15,6 +15,7 @@ public class EchoInput
 public class EchoOutput : BaseResult
 {
     public String? echo { get; set; }
+    public int sum { get; set; }
 }
 
 public class DemoApiWrapper : ApiWrapper

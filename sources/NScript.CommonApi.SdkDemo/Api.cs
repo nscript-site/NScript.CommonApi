@@ -19,6 +19,7 @@ public class EchoInput
 public class EchoOutput : BaseResult
 {
     public String? echo { get; set; }
+    public int sum { get; set; }
 }
 
 public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
@@ -46,6 +47,11 @@ public class EchoPayloadApiHandler : TypedPayloadApiHandler<EchoInput, EchoOutpu
         EchoOutput output = new EchoOutput();
         var msg = input.message ?? String.Empty;
         output.echo = $"{msg}, payload: {payload.Length} bytes";
+        var bytes = payload.ToArray();
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            output.sum += bytes[i];
+        }
         return output;
     }
 

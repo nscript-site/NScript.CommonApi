@@ -84,4 +84,9 @@ public class Api : BaseApi
     {
         return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
     }
+
+    public static Api GetInstance()
+    {
+        return Instance.Value;
+    }
 }

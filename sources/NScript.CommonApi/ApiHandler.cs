@@ -18,6 +18,11 @@ public interface IApiHandler
     String Handle(String jsonParams, Payload payload);
 }
 
+public interface ITypedApiHandler<TInput, TOutput> where TOutput : BaseResult, new()
+{
+    TOutput? Invoke(TInput? input, Payload payload);
+}
+
 public abstract class ApiHandler : IApiHandler
 {
     public abstract String Handle(String jsonParams);
@@ -33,7 +38,7 @@ public abstract class PayloadApiHandler : IApiHandler
     public abstract String Handle(String jsonParams, Payload payload);
 }
 
-public abstract class TypedApiHandler<TInput, TOutput> : ApiHandler where TOutput : BaseResult, new()
+public abstract class TypedApiHandler<TInput, TOutput> : ApiHandler, ITypedApiHandler<TInput, TOutput> where TOutput : BaseResult, new()
 {
     protected abstract ValueTuple<JsonTypeInfo<TInput>, JsonTypeInfo<TOutput>> GetTypeInfos();
 
@@ -69,9 +74,14 @@ public abstract class TypedApiHandler<TInput, TOutput> : ApiHandler where TOutpu
     /// <param name="payload">输入的二进制负载。对于 json 序列化代价比较大的数据，可以通过 payload 直接内存传输。</param>
     /// <returns></returns>
     protected abstract TOutput? Handle(TInput? input);
+
+    public TOutput? Invoke(TInput? input, Payload payload)
+    {
+        return Handle(input);
+    }
 }
 
-public abstract class TypedPayloadApiHandler<TInput,TOutput> : PayloadApiHandler where TOutput:BaseResult,new()
+public abstract class TypedPayloadApiHandler<TInput,TOutput> : PayloadApiHandler, ITypedApiHandler<TInput, TOutput> where TOutput:BaseResult,new()
 {
     protected abstract ValueTuple<JsonTypeInfo<TInput>, JsonTypeInfo<TOutput>> GetTypeInfos();
 
@@ -107,4 +117,9 @@ public abstract class TypedPayloadApiHandler<TInput,TOutput> : PayloadApiHandler
     /// <param name="payload">输入的二进制负载。对于 json 序列化代价比较大的数据，可以通过 payload 直接内存传输。</param>
     /// <returns></returns>
     protected abstract TOutput? Handle(TInput? input, Payload payload);
+
+    public TOutput? Invoke(TInput? input, Payload payload)
+    {
+        return Handle(input, payload);
+    }
 }

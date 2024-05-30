@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\sources\NScript.CommonApi.SdkDemo\NScript.CommonApi.SdkDemo.csproj" />
+    <ProjectReference Include="..\..\sources\NScript.CommonApi\NScript.CommonApi.csproj" />
+  </ItemGroup>
+
+</Project>

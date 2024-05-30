@@ -2,6 +2,8 @@
 using System.Text.Json;
 
 var wrapper = new DemoApiWrapper();
+
+// 设置 jit hook。这样一来，所有的 api 调用都会走 jit hook，而不是真正的 pinvoke 调用。
 wrapper.SetJitHook(NScript.CommonApi.SdkDemo.Api.JitHandle);
 
 EchoOutput output = wrapper.Invoke<EchoInput, EchoOutput>("echo", new EchoInput() { message = "hello world!" });

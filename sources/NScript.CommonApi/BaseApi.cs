@@ -48,7 +48,7 @@ public class BaseApi
     /// <param name="payload"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public TOutput? Invoke<TInput,TOutput>(string route, TInput? input, Payload payload) where TOutput : BaseResult, new()
+    public TOutput Invoke<TInput,TOutput>(string route, TInput? input, Payload payload) where TOutput : BaseResult, new()
     {
         IApiHandler? match;
         this.ApiHandlers.TryGetValue(route, out match);
@@ -63,7 +63,7 @@ public class BaseApi
         return hander.Invoke(input, payload);
     }
 
-    public unsafe TOutput? Invoke<TInput, TOutput>(string route, TInput? input, byte[] payloadData) where TOutput : BaseResult, new()
+    public unsafe TOutput Invoke<TInput, TOutput>(string route, TInput? input, byte[] payloadData) where TOutput : BaseResult, new()
     {
         fixed (byte* pData = payloadData)
         {
@@ -71,7 +71,7 @@ public class BaseApi
         }
     }
 
-    public TOutput? Invoke<TInput, TOutput>(string route, TInput? input) where TOutput : BaseResult, new()
+    public TOutput Invoke<TInput, TOutput>(string route, TInput? input) where TOutput : BaseResult, new()
     {
         return Invoke<TInput, TOutput>(route, input, Payload.Empty);
     }

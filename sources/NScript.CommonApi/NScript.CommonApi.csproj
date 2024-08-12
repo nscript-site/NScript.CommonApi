@@ -12,14 +12,19 @@
     <RepositoryType>git</RepositoryType>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <PackageIcon>logo128.png</PackageIcon>
-    <AssemblyVersion>7.0.6.0</AssemblyVersion>
-    <FileVersion>7.0.6.0</FileVersion>
-    <Version>7.0.6</Version>
+    <AssemblyVersion>7.0.7.0</AssemblyVersion>
+    <FileVersion>7.0.7.0</FileVersion>
+    <Version>7.0.7</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\assets\logo128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\license.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

@@ -24,9 +24,9 @@ public class EchoOutput : BaseResult
 
 public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
 {
-    protected override EchoOutput? Handle(EchoInput? input)
+    protected override EchoOutput Handle(EchoInput? input)
     {
-        if (input == null) return null;
+        if (input == null) return new EchoOutput();
         EchoOutput output = new EchoOutput();
         var msg = input.message ?? String.Empty;
         output.echo = $"{msg}";
@@ -41,9 +41,9 @@ public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
 
 public class EchoPayloadApiHandler : TypedPayloadApiHandler<EchoInput, EchoOutput>
 {
-    protected override EchoOutput? Handle(EchoInput? input, Payload payload)
+    protected override EchoOutput Handle(EchoInput? input, Payload payload)
     {
-        if (input == null) return null;
+        if (input == null) return new EchoOutput();
         EchoOutput output = new EchoOutput();
         var msg = input.message ?? String.Empty;
         output.echo = $"{msg}, payload: {payload.Length} bytes";

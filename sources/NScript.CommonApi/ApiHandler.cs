@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using System.Threading.Tasks;
 
 namespace NScript.CommonApi;
 
@@ -20,7 +15,7 @@ public interface IApiHandler
 
 public interface ITypedApiHandler<TInput, TOutput> where TOutput : BaseResult, new()
 {
-    TOutput? Invoke(TInput? input, Payload payload);
+    TOutput Invoke(TInput? input, Payload payload);
 }
 
 public abstract class ApiHandler : IApiHandler
@@ -44,13 +39,13 @@ public abstract class TypedApiHandler<TInput, TOutput> : ApiHandler, ITypedApiHa
 
     public override string Handle(string jsonParams)
     {
-        String outputStr = null;
+        String outputStr = string.Empty;
         String err = null;
         var pair = GetTypeInfos();
         try
         {
             TInput? input = JsonSerializer.Deserialize<TInput>(jsonParams, pair.Item1);
-            TOutput? output = Handle(input);
+            TOutput output = Handle(input);
             outputStr = JsonSerializer.Serialize<TOutput>(output, pair.Item2);
         }
         catch (JsonException ex)
@@ -73,9 +68,9 @@ public abstract class TypedApiHandler<TInput, TOutput> : ApiHandler, ITypedApiHa
     /// <param name="input">输入。input 将会序列化为 json 传输到 common api。</param>
     /// <param name="payload">输入的二进制负载。对于 json 序列化代价比较大的数据，可以通过 payload 直接内存传输。</param>
     /// <returns></returns>
-    protected abstract TOutput? Handle(TInput? input);
+    protected abstract TOutput Handle(TInput? input);
 
-    public TOutput? Invoke(TInput? input, Payload payload)
+    public TOutput Invoke(TInput? input, Payload payload)
     {
         return Handle(input);
     }
@@ -87,13 +82,13 @@ public abstract class TypedPayloadApiHandler<TInput,TOutput> : PayloadApiHandler
 
     public override string Handle(string jsonParams, Payload payload)
     {
-        String outputStr = null;
+        String outputStr = string.Empty;
         String err = null;
         var pair = GetTypeInfos();
         try
         {
             TInput? input = JsonSerializer.Deserialize<TInput>(jsonParams, pair.Item1);
-            TOutput? output = Handle(input, payload);
+            TOutput output = Handle(input, payload);
             outputStr = JsonSerializer.Serialize<TOutput>(output, pair.Item2);
         }
         catch(JsonException ex)
@@ -116,9 +111,9 @@ public abstract class TypedPayloadApiHandler<TInput,TOutput> : PayloadApiHandler
     /// <param name="input">输入。input 将会序列化为 json 传输到 common api。</param>
     /// <param name="payload">输入的二进制负载。对于 json 序列化代价比较大的数据，可以通过 payload 直接内存传输。</param>
     /// <returns></returns>
-    protected abstract TOutput? Handle(TInput? input, Payload payload);
+    protected abstract TOutput Handle(TInput? input, Payload payload);
 
-    public TOutput? Invoke(TInput? input, Payload payload)
+    public TOutput Invoke(TInput? input, Payload payload)
     {
         return Handle(input, payload);
     }

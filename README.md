@@ -1,103 +1,13 @@
 # NScript.CommonApi
 
-## 简介
+## 介绍
 
-NativeAOT 推出后，csharp 可以方便的撰写各种库或sdk，暴露 cstyle api，供其它语言调用。它的优势是，开发速度快，运行速度也不弱，生成的动态链接库的尺寸也不大，很适合应用软件的底层开发。
+NScript.CommonApi 提供了一套使用 csharp 的 NativeAOT 开发动态链接库，提供基于路由、json格式输入输出的 api 机制，使得动态链接库的调用体验接近于 webapi。
 
-然而，cstyle api 调用很不方便，为了简化 api 的提供和调用，CommonApi 的目的是制定一套 NativeAOT 开发 api 的规范，并提供相关封装，使得sdk的开发者，可以用类似开发 webapi 的方式，来提供 sdk api。调用层，也可以用类似 webapi 的方式，来进行调用。
-
-这样一来，对于上层语言，我们只需要针对该语言，编写一套公共调用库和文档即可，而不需要，每一个新项目，每一个新接口，都需要独立的文档及示例代码。
-
-## 约定
-
-### 底层接口
-
-Sdk 开发者，只对外公开一个接口，所有上层语言，对sdk的调用，均转发到该接口执行：
-```c
-char* your_api_name(char* route, char* pJsonParams, void* pPayload, int payloadLength)
-```
-在 csharp 侧，该接口表现为：
-```csharp
-[UnmanagedCallersOnly(EntryPoint = "your_api_name")]
-public static IntPtr Handle(IntPtr pRoute, IntPtr pJsonParams, IntPtr pPayload, int payloadLength)
-```
-约定：
-- 对 api 的调用，需要传入路由字符串和 json 格式的入参，以 json 格式返回结果。
-- 对于 json 序列化成本较高的数据，可通过 payload 直接传入，以减少序列化和反序列化的计算成本
-- 输入参数中字符串、payload 所在的内存，由调用方负责管理。输出字符串虽然由底层库产生，但也由调用方管理。
-
-### Sdk 开发
-
-NScript.CommonApi 对 api 的提供进行了封装，可通过 nuget 安装。NScript.CommonApi 提供了 BaseApi、TypedApiHandler、BaseResult 三个基类。基于这些基类，程序员即可以开发 webapi 的类似体验，进行 sdk 开发。
-
-下面是一个开发示例。Sdk 的整体代码框架如下：
+使用 demo：
 
 ```csharp
-public class Api : BaseApi
-{
-    static Lazy<Api> Instance = new Lazy<Api>(() => {
-        var api = new Api();
-        // 注册 ApiHandler 到指定路由
-        // api.Map("your-route1", new YourRoute1ApiHandler());
-        // api.Map("your-route2", new YourRoute2ApiHandler());
-        // ...
-        return api;
-    });
 
-    // 可以修改 EntryPoint 为其它名字
-    [UnmanagedCallersOnly(EntryPoint = "sdk_demo_api")]
-    public unsafe static IntPtr Handle(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
-    {
-        return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
-    }
-}
-```
-
-在 Api 类里注册路由，进来的调用，将通过路由，找到对应的 ApiHandler，进行处理。
-
-我们试着添加一个 `EchoApiHandler`，这个 ApiHandler 实现的逻辑是，接收一个 EchoInput 输入，产生一个 EchoOutput 输出，输出携带 EchoInput 的 message 以及 payload 信息 ：
-
-```csharp
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization | JsonSourceGenerationMode.Metadata)]
-[JsonSerializable(typeof(EchoInput))]
-[JsonSerializable(typeof(EchoOutput))]
-internal partial class EchoSerializeOnlyContext : JsonSerializerContext
-{
-}
-
-public class EchoInput
-{
-    public String? message { get; set; }
-}
-
-public class EchoOutput : BaseResult
-{
-    public String? echo { get; set; }
-}
-
-public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
-{
-    protected override EchoOutput? Handle(EchoInput? input, Payload payload)
-    {
-        if (input == null) return null;
-        EchoOutput output = new EchoOutput();
-        var msg = input.message ?? String.Empty;
-        output.echo = $"{msg}, payload: {payload.Length} bytes";
-        return output;
-    }
-
-    protected override (JsonTypeInfo<EchoInput>, JsonTypeInfo<EchoOutput>) GetTypeInfos()
-    {
-        return (EchoSerializeOnlyContext.Default.EchoInput, EchoSerializeOnlyContext.Default.EchoOutput);
-    }
-}
-```
-
-这里注意，上面的 JsonSourceGenerationOptions 部分代码很重要，因为 NativeAOT对反射支持的不好，这里通过 dotnet 的 SourceGeneration 特性，对NativeAOT下相关类型的序列化和反序列化提供支持。
-
-完整的代码如下:
-
-```csharp
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -119,16 +29,39 @@ public class EchoInput
 public class EchoOutput : BaseResult
 {
     public String? echo { get; set; }
+    public int sum { get; set; }
 }
 
 public class EchoApiHandler : TypedApiHandler<EchoInput, EchoOutput>
 {
-    protected override EchoOutput? Handle(EchoInput? input, Payload payload)
+    protected override EchoOutput Handle(EchoInput? input)
     {
-        if (input == null) return null;
+        if (input == null) return new EchoOutput();
+        EchoOutput output = new EchoOutput();
+        var msg = input.message ?? String.Empty;
+        output.echo = $"{msg}";
+        return output;
+    }
+
+    protected override (JsonTypeInfo<EchoInput>, JsonTypeInfo<EchoOutput>) GetTypeInfos()
+    {
+        return (EchoSerializeOnlyContext.Default.EchoInput, EchoSerializeOnlyContext.Default.EchoOutput);
+    }
+}
+
+public class EchoPayloadApiHandler : TypedPayloadApiHandler<EchoInput, EchoOutput>
+{
+    protected override EchoOutput Handle(EchoInput? input, Payload payload)
+    {
+        if (input == null) return new EchoOutput();
         EchoOutput output = new EchoOutput();
         var msg = input.message ?? String.Empty;
         output.echo = $"{msg}, payload: {payload.Length} bytes";
+        var bytes = payload.ToArray();
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            output.sum += bytes[i];
+        }
         return output;
     }
 
@@ -146,6 +79,7 @@ public class Api : BaseApi
         // api.Map("your-route1", new YourRoute1ApiHandler());
         // api.Map("your-route2", new YourRoute2ApiHandler());
         api.Map("echo", new EchoApiHandler());
+        api.Map("echo-payload", new EchoPayloadApiHandler());
         return api;
     });
 
@@ -155,16 +89,50 @@ public class Api : BaseApi
     {
         return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
     }
+
+    public static IntPtr JitHandle(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
+    {
+        return Instance.Value.HandleApi(pRoute, pJsonParams, pDataPayload, payloadLength);
+    }
+
+    public static Api GetInstance()
+    {
+        return Instance.Value;
+    }
 }
 ```
 
-以 NativeAOT 模式 publish，得到 dll，这个 dll 我们暂且命名为 NScript.CommonApi.SdkDemo.dll，大小为 3.6M。
+上例中，通过 api.Map 可以注册路由及对应的 ApiHandler。ApiHandler 分为两类，TypedApiHandler 和 TypedPayloadApiHandler。TypedPayloadApiHandler 的输入，比 TypedApiHandler 多了个 Payload。对于序列化和反序列化代价较大的参数，可以通过 Payload 来传进来。上例中，分别实现了一个 TypedApiHandler 和一个 TypedPayloadApiHandler。
 
-### sdk 调用
+有三种模式，来调用上例中的 API，下面逐一说明。
 
-每个语言可以对 api 进行自己的封装。这里以 csharp 为例子。NScript.CommonApi.Wrapper 是我进行的 csharp 版本的封装，可通过 nuget 安装。调用时，只需要简单的继承下 ApiWrapper，设置好 dllimport，做个转发即可：
+## 模式1：通过动态链接库来调用
 
-```chsarp
+将将上例通过 NativeAOT 编译成动态链接库，供上层各个语言来调用。
+
+每种语言，只需要封装一次，即可实现统一的调用方式。
+
+其中，csharp 版的封装为 [NScript.CommonApi.Wrapper](https://www.nuget.org/packages/NScript.CommonApi.Wrapper)。如此一来，底层可以用 Native AOT 编译，来防止反编译。UI 层，可以用 jit 模式运行，来提高应用的灵活度。
+
+如果是使用其他语言来调用，需要参考 [NScript.CommonApi.Wrapper的实现](https://github.com/nscript-site/NScript.CommonApi/tree/main/wrappers/dotnet/NScript.CommonApi.Wrapper) 自行封装。
+
+使用 NScript.CommonApi.Wrapper 来调用示例如下：
+
+```csharp
+using System.Runtime.InteropServices;
+
+namespace NScript.CommonApi.WrapperTest;
+
+public class EchoInput
+{
+    public String? message { get; set; }
+}
+
+public class EchoOutput : BaseResult
+{
+    public String? echo { get; set; }
+    public int sum { get; set; }
+}
 
 public class DemoApiWrapper : ApiWrapper
 {
@@ -179,9 +147,75 @@ public class DemoApiWrapper : ApiWrapper
 
 ```
 
-把 Sdk 里的实体类复制过来：
+Program.cs 代码如下:
 
 ```csharp
+using NScript.CommonApi.WrapperTest;
+using System.Text.Json;
+
+var wrapper = new DemoApiWrapper();
+EchoOutput output = wrapper.Invoke<EchoInput,EchoOutput>("echo", new EchoInput() { message = "hello world!" });
+Console.WriteLine(JsonSerializer.Serialize(output));
+
+var bytes = new byte[1024];
+for (int i = 0; i < bytes.Length; i++)
+{
+    bytes[i] = (byte)(i % 256);
+}
+
+output = wrapper.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, bytes);
+Console.WriteLine(JsonSerializer.Serialize(output));
+
+output = wrapper.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { message = "hello world!" });
+Console.WriteLine(JsonSerializer.Serialize(output));
+Console.ReadKey();
+```
+
+运行一下:
+
+```bash
+{"echo":"hello world!","sum":0,"code":0,"message":null}
+{"echo":"hello world with payload!, payload: 1024 bytes","sum":130560,"code":0,"message":null}
+{"echo":null,"sum":0,"code":-12,"message":"InvalidRoute"}
+```
+
+## 模式2：csharp 下直接调用
+
+有时候，不需要通过动态链接库来调用。比如，底层和应用层都使用 csharp 来开发。底层和应用层以相同的模式运行，比如，皆是 jit 模式，或者，皆是 AOT 模式（例如，iOS 应用）。这时，通过 json 来传值，显得有些多余。可以直接进行强类型的传值，示例如下：
+
+```csharp
+using NScript.CommonApi.SdkDemo;
+using System.Text.Json;
+
+void TestApi()
+{
+    var api = Api.GetInstance();
+    EchoOutput output = api.Invoke<EchoInput, EchoOutput>("echo", new EchoInput() { message = "hello world!" });
+    Console.WriteLine(JsonSerializer.Serialize(output));
+
+    var bytes = new byte[1024];
+    for (int i = 0; i < bytes.Length; i++)
+    {
+        bytes[i] = (byte)(i % 256);
+    }
+
+    output = api.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, bytes!);
+    Console.WriteLine(JsonSerializer.Serialize(output));
+}
+
+TestApi();
+
+```
+
+## 模式3：调试动态链接库
+
+在模式1中，直接调试动态链接库会比较麻烦。如果应用层语言也是 csharp，提供了个 jit handle，使用 json 传值模式，以 jit 模式运行底层模块，方便各种调试。示例代码如下（需要添加对 NScript.CommonApi.SdkDemo 的引用）：
+
+```csharp
+using System.Runtime.InteropServices;
+
+namespace NScript.CommonApi.WrapperJitTest;
+
 public class EchoInput
 {
     public String? message { get; set; }
@@ -190,27 +224,59 @@ public class EchoInput
 public class EchoOutput : BaseResult
 {
     public String? echo { get; set; }
+    public int sum { get; set; }
+}
+
+public class DemoApiWrapper : ApiWrapper
+{
+    [DllImport("NScript.CommonApi.SdkDemo.dll")]
+    static extern IntPtr sdk_demo_api(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength);
+
+    protected override IntPtr InvokeApi(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength)
+    {
+        return sdk_demo_api(pRoute, pJsonParams, pDataPayload, payloadLength);
+    }
 }
 ```
 
-开始调用：
+Program.cs 代码如下:
 
 ```csharp
+using NScript.CommonApi.WrapperJitTest;
+using System.Text.Json;
+
 var wrapper = new DemoApiWrapper();
-EchoOutput output = wrapper.Invoke<EchoInput,EchoOutput>("echo", new EchoInput() { message = "hello world!" });
+
+// 设置 jit hook。这样一来，所有的 api 调用都会走 jit hook，而不是真正的 pinvoke 调用。
+wrapper.SetJitHook(NScript.CommonApi.SdkDemo.Api.JitHandle);
+
+EchoOutput output = wrapper.Invoke<EchoInput, EchoOutput>("echo", new EchoInput() { message = "hello world!" });
 Console.WriteLine(JsonSerializer.Serialize(output));
 
-output = wrapper.Invoke<EchoInput, EchoOutput>("echo", new EchoInput() { message = "hello world with payload!" }, new byte[1024]);
+var bytes = new byte[1024];
+for (int i = 0; i < bytes.Length; i++)
+{
+    bytes[i] = (byte)(i % 256);
+}
+
+output = wrapper.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, bytes);
 Console.WriteLine(JsonSerializer.Serialize(output));
+
 
 output = wrapper.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { message = "hello world!" });
 Console.WriteLine(JsonSerializer.Serialize(output));
+Console.ReadKey();
+
 ```
 
-输出：
+运行一下:
 
-```json
-{"echo":"hello world!, payload: 0 bytes","code":0,"message":null}
-{"echo":"hello world with payload!, payload: 1024 bytes","code":0,"message":null}
-{"echo":null,"code":-12,"message":"InvalidRoute"}
+```bash
+{"echo":"hello world!","sum":0,"code":0,"message":null}
+{"echo":"hello world with payload!, payload: 1024 bytes","sum":130560,"code":0,"message":null}
+{"echo":null,"sum":0,"code":-12,"message":"InvalidRoute"}
 ```
+
+## snippets
+
+Visual Studio 下的 snippets 见 [commonapi.snippet](./tools/commonapi.snippet)，可在 Visual Studio 的 [Tools]-[Code Snippets Manager] 界面导入。

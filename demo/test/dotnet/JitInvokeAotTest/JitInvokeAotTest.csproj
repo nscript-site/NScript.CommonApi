@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\sources\NScript.CommonApi.SdkDemo\bin\Release\net7.0\win-x64\native\NScript.CommonApi.SdkDemo.dll" Link="NScript.CommonApi.SdkDemo.dll">
+    <None Include="..\..\..\NScript.CommonApi.Demo.NativeLibrary\bin\Release\net7.0\win-x64\publish\NScript.CommonApi.Demo.NativeLibrary.dll" Link="NScript.CommonApi.Demo.NativeLibrary.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NScript.CommonApi.Wrapper\NScript.CommonApi.Wrapper.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,7 +20,7 @@ namespace NScript.CommonApi
 
         protected abstract IntPtr InvokeApi(IntPtr pRoute, IntPtr pJsonParams, IntPtr pDataPayload, int payloadLength);
 
-        public TOutput Invoke<TInput, TOutput>(String route, TInput input, byte[]? payload = null) where TOutput : class
+        public TOutput Invoke<TInput, TOutput>(String route, TInput input, byte[]? payload = null) where TOutput : BaseResult, new()
         {
             if(payload == null)
             {
@@ -38,9 +38,9 @@ namespace NScript.CommonApi
             }
         }
 
-        public TOutput Invoke<TInput,TOutput>(String route, TInput input, IntPtr pDataPayload, int payloadLength) where TOutput:class
+        public TOutput Invoke<TInput,TOutput>(String route, TInput input, IntPtr pDataPayload, int payloadLength) where TOutput:BaseResult,new()
         {
-            TOutput output = null;
+            TOutput? output = null;
 
             String inputStr = JsonSerializer.Serialize(input);
             IntPtr pRoute = Marshal.StringToHGlobalAnsi(route);
@@ -54,7 +54,7 @@ namespace NScript.CommonApi
                     pResult = InvokeApi(pRoute, pInputStr, pDataPayload, payloadLength);
                 if (pResult != IntPtr.Zero)
                 {
-                    String result = Marshal.PtrToStringAnsi(pResult);
+                    String? result = Marshal.PtrToStringAnsi(pResult);
                     if (result != null) output = JsonSerializer.Deserialize<TOutput>(result);
                 }
             }
@@ -65,7 +65,7 @@ namespace NScript.CommonApi
                 if (pInputStr != IntPtr.Zero) Marshal.FreeHGlobal(pInputStr);
             }
 
-            return output;
+            return output ?? new TOutput() { code = Error.Other, message = "null output" };
         }
     }
 }

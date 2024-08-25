@@ -1,4 +1,5 @@
-﻿using NScript.CommonApi.Demo.NativeLibrary.Sdk;
+﻿using NScript.CommonApi;
+using NScript.CommonApi.Demo.NativeLibrary.Sdk;
 using System.Text.Json;
 
 namespace Common;
@@ -16,10 +17,8 @@ public class TestCase
             bytes[i] = (byte)(i % 256);
         }
 
-        output = MyLib.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, bytes);
-        Console.WriteLine(JsonSerializer.Serialize(output));
+        MyLib.Invoke<EchoInput, EchoOutput>("echo-payload", new EchoInput() { message = "hello world with payload!" }, bytes).WriteLine();
 
-        output = MyLib.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { message = "hello world!" });
-        Console.WriteLine(JsonSerializer.Serialize(output));
+        MyLib.Invoke<EchoInput, EchoOutput>("invalid-route", new EchoInput() { message = "hello world!" }).WriteLine();
     }
 }

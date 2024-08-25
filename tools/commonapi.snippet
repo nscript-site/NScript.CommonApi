@@ -35,13 +35,14 @@ public class $ApiName$ApiHandler : TypedApiHandler<$InputType$, $OutputType$>
 {
     protected override $OutputType$ Handle($InputType$? input)
     {
+        if (input == null) return new $OutputType$ { code = Error.InvalidInput, message = "input is null" };
         // your api implementation here
         throw new NotImplementedException();
     }
 
     protected override (JsonTypeInfo<$InputType$>, JsonTypeInfo<$OutputType$>) GetTypeInfos()
     {
-        return ($ApiName$SerializeOnlyContext.Default.$InputType$, InitSerializeOnlyContext.Default.$OutputType$);
+        return ($ApiName$SerializeOnlyContext.Default.$InputType$, $ApiName$SerializeOnlyContext.Default.$OutputType$);
     }
 }
                 ]]>
@@ -84,13 +85,14 @@ public class $ApiName$ApiHandler : TypedPayloadApiHandler<$InputType$, $OutputTy
 {
     protected override $OutputType$ Handle($InputType$? input, Payload payload)
     {
+        if (input == null) return new $OutputType$ { code = Error.InvalidInput, message = "input is null" };
         // your api implementation here
         throw new NotImplementedException();
     }
 
     protected override (JsonTypeInfo<$InputType$>, JsonTypeInfo<$OutputType$>) GetTypeInfos()
     {
-        return ($ApiName$SerializeOnlyContext.Default.$InputType$, InitSerializeOnlyContext.Default.$OutputType$);
+        return ($ApiName$SerializeOnlyContext.Default.$InputType$, $ApiName$SerializeOnlyContext.Default.$OutputType$);
     }
 }
                 ]]>
@@ -201,12 +203,12 @@ public class $LibraryName$
         NativeApi.Value.SetJitHook(jitHandle);
     }
 
-    public static TOutput Invoke<TInput, TOutput>(string route, TInput input, byte[]? payload = null) where TOutput : class
+    public static TOutput Invoke<TInput, TOutput>(string route, TInput input, byte[]? payload = null) where TOutput : BaseResult, new()
     {
         return NativeApi.Value.Invoke<TInput, TOutput>(route, input, payload);
     }
 
-    public static TOutput Invoke<TInput, TOutput>(string route, TInput input, IntPtr pPayload, int payloadLength) where TOutput : class
+    public static TOutput Invoke<TInput, TOutput>(string route, TInput input, IntPtr pPayload, int payloadLength) where TOutput : BaseResult, new()
     {
         return NativeApi.Value.Invoke<TInput, TOutput>(route, input, pPayload, payloadLength);
     }
